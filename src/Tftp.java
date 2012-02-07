@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-public class tftp {
+public class Tftp {
 
 	static final short RRQ = 1;
 	static final short WRQ = 2;

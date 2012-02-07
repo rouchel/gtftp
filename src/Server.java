@@ -2,18 +2,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
-class message {
-	String hostIp;
-}
+public class Server extends Tftp implements Runnable {
 
-public class Server extends tftp implements Runnable {
+	void processTransferInfo(TransferInfo info) {
 
-	message msg = null;
-
-	public Server(message msg) throws UnknownHostException {
-		this.msg = msg;
 	}
 
 	@Override
@@ -33,7 +26,7 @@ public class Server extends tftp implements Runnable {
 
 				opcode = getOpcode(rcvBuffer);
 				System.out.println("opcode:   " + opcode);
-				
+
 				switch (opcode) {
 				case RRQ:
 				case WRQ:
@@ -41,13 +34,15 @@ public class Server extends tftp implements Runnable {
 					mod = getMod(rcvBuffer);
 					System.out.println("filename: " + filename);
 					System.out.println("mod:      " + mod);
-					
-					transfer t2 = new transfer(
+
+					TransferInfo subTransferThread = new TransferInfo(
 							packet.getAddress(), packet.getPort(), opcode,
 							filename, mod);
 					System.out.println(packet.getSocketAddress());
-					
-					new Thread(t2).start();
+
+					processTransferInfo(subTransferThread);
+
+					new Thread(subTransferThread).start();
 					break;
 
 				default:
@@ -66,4 +61,9 @@ public class Server extends tftp implements Runnable {
 
 	}
 
+
+	public static void main(String[] args) {
+		Server server = new Server();
+		server.run();
+	}
 }
