@@ -1,12 +1,20 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 
-public class Server extends Tftp implements Runnable {
+public class Server extends Tftp {
+	protected String serverPath = "./";
+	protected boolean isRunning = true;
 
-	void processTransferInfo(TransferInfo info) {
+	void createTransfer(InetAddress addr, int port, short request,
+			String path, String file, String mode) {
 
+		Transfer transfer = 
+				new Transfer(addr, port, request, path, file, mode);
+
+		new Thread(transfer).start();
 	}
 
 	public void run() {
@@ -17,6 +25,11 @@ public class Server extends Tftp implements Runnable {
 					rcvBuffer.length);
 
 			while (true) {
+				if (!isRunning) {
+					Thread.sleep(100);
+					continue;
+				}
+
 				receivePacket(socket, packet, rcvBuffer);
 
 				short opcode;
@@ -34,14 +47,10 @@ public class Server extends Tftp implements Runnable {
 						System.out.println("filename: " + filename);
 						System.out.println("mod:      " + mod);
 
-						TransferInfo subTransferThread = new TransferInfo(
-								packet.getAddress(), packet.getPort(), opcode,
-								filename, mod);
 						System.out.println(packet.getSocketAddress());
-
-						processTransferInfo(subTransferThread);
-
-						new Thread(subTransferThread).start();
+						createTransfer(packet.getAddress(), packet.getPort(), opcode,
+								serverPath, filename, mod);
+						
 						break;
 
 					default :
@@ -53,7 +62,10 @@ public class Server extends Tftp implements Runnable {
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (@SuppressWarnings("hiding") IOException e) {
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
