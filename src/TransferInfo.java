@@ -2,10 +2,9 @@ import java.net.InetAddress;
 
 import javax.swing.JProgressBar;
 
-
 public class TransferInfo extends Transfer {
 	JProgressBar progressBar;
-
+	
 	public TransferInfo(InetAddress remoteAddress, int remotePort,
 			short opcode, String filename, String mod) {
 		super(remoteAddress, remotePort, opcode, filename, mod);
@@ -22,4 +21,5 @@ public class TransferInfo extends Transfer {
 		progressBar.setValue(percent);
 		progressBar.setString(sendMsg);
 	}
+	
 }

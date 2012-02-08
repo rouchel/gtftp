@@ -19,7 +19,7 @@ class Transfer extends Tftp implements Runnable {
 	private InetAddress remoteAddress;
 	private int remotePort;
 	private short opcode;
-	private String path = "/maxwit/vdisk/iso/";
+	protected String path = "/maxwit/ebook/";
 	private String filename;
 	private long filesize;
 	private long sendsize;

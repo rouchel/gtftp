@@ -3,12 +3,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
+import sun.misc.Signal;
+
 public class Server extends Tftp implements Runnable {
 
 	void processTransferInfo(TransferInfo info) {
-
 	}
-
+	
 	@Override
 	public void run() {
 		try {
@@ -41,6 +44,8 @@ public class Server extends Tftp implements Runnable {
 					System.out.println(packet.getSocketAddress());
 
 					processTransferInfo(subTransferThread);
+					
+					System.out.println(subTransferThread.path);
 
 					new Thread(subTransferThread).start();
 					break;

@@ -8,6 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +20,14 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.xml.soap.Text;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
+import sun.misc.Signal;
+import sun.security.krb5.internal.Ticket;
 
 public class GUI extends JFrame {
 
@@ -28,9 +39,10 @@ public class GUI extends JFrame {
 	private JButton btStat;
 	private JButton btExit;
 	private JButton btPath;
-	private JTextField pathTf;
+    protected JTextField pathTf;
 	private JButton ipAddr;
-	 private JPanel panel;
+	private JPanel panel;
+	//protected String signal;
 
 	public void addProcessBar(JProgressBar bar) {
 		panel.add(bar);
@@ -103,7 +115,7 @@ public class GUI extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				// TODO Auto-generated method stub
 				Server t1 = null;
-
+				
 				new Thread(t1).start();
 			}
 
@@ -118,8 +130,18 @@ public class GUI extends JFrame {
 		setBounds(250, 120, 800, 600);
 		setResizable(false);
 		setVisible(true);
+		
+		pathTf.addVetoableChangeListener(new VetoableChangeListener() {
+			
+			@Override
+			public void vetoableChange(PropertyChangeEvent arg0)
+					throws PropertyVetoException {
+				// TODO Auto-generated method stub
+				//signal = pathTf.getText();
+			}
+		});
 	}
-
+	
 	private ActionListener actlis = new ActionListener() {
 
 		@Override
@@ -136,4 +158,6 @@ public class GUI extends JFrame {
 			}
 		}
 	};
+	
+	
 }

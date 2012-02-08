@@ -12,6 +12,7 @@ public class ServerGUI extends Server {
 		// TODO Auto-generated method stub
 		super.processTransferInfo(info);
 		gui.addProcessBar(info.progressBar);
+		//info.path = gui.pathTf.getText();
 	}
 	
 	public static void main(String[] args) {
