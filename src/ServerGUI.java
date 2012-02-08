@@ -1,4 +1,3 @@
-
 public class ServerGUI extends Server {
 	GUI gui;
 
@@ -14,9 +13,9 @@ public class ServerGUI extends Server {
 		gui.addProcessBar(info.progressBar);
 		//info.path = gui.pathTf.getText();
 	}
-	
+
 	public static void main(String[] args) {
 		ServerGUI server = new ServerGUI();
-		server.run();
+		new Thread(server).start();
 	}
 }
