@@ -30,7 +30,7 @@ public class GUI extends JFrame {
 	private JButton btPath;
 	private JTextField pathTf;
 	private JButton ipAddr;
-	 private JPanel panel;
+	private JPanel panel;
 
 	public void addProcessBar(JProgressBar bar) {
 		panel.add(bar);
@@ -38,7 +38,7 @@ public class GUI extends JFrame {
 		System.out.println("add bar!");
 	}
 
-	public GUI(String str) {	
+	public GUI(String str) {
 		cont = getContentPane();
 		cont.setLayout(null);
 		cont.setBackground(Color.white);
@@ -102,9 +102,7 @@ public class GUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				Server t1 = null;
-
-				new Thread(t1).start();
+				
 			}
 
 		});

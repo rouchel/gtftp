@@ -6,8 +6,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 
 import com.sun.jndi.url.iiopname.iiopnameURLContextFactory;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 class Transfer extends Tftp implements Runnable {
 
@@ -19,7 +21,7 @@ class Transfer extends Tftp implements Runnable {
 	private InetAddress remoteAddress;
 	private int remotePort;
 	private short opcode;
-	private String path = "/maxwit/vdisk/iso/";
+	private String path = "/media/0002751C0006EF15/";
 	private String filename;
 	private long filesize;
 	private long sendsize;
@@ -28,13 +30,13 @@ class Transfer extends Tftp implements Runnable {
 	protected int percent;
 
 	static final int RetryNum = 5;
-	
+
 	protected void progressMsg() {
-		System.out.print(sendMsg + '\r');
+		// System.out.print(sendMsg + '\r');
 	}
 
-	public Transfer(InetAddress remoteAddress, int remotePort,
-			short opcode, String filename, String mod) {
+	public Transfer(InetAddress remoteAddress, int remotePort, short opcode,
+			String filename, String mod) {
 		this.remoteAddress = remoteAddress;
 		this.remotePort = remotePort;
 		this.opcode = opcode;
@@ -68,7 +70,7 @@ class Transfer extends Tftp implements Runnable {
 		subPacket = new DatagramPacket(rcvBuffer, PKG_LEN, remoteAddress,
 				remotePort);
 		RandomAccessFile af = null;
-		
+
 		try {
 			try {
 				af = new RandomAccessFile(path + filename, "r");
@@ -78,7 +80,7 @@ class Transfer extends Tftp implements Runnable {
 				e1.printStackTrace();
 				return;
 			}
-			
+
 			filesize = af.length();
 
 			subSocket.setSoTimeout(2000);
@@ -89,10 +91,15 @@ class Transfer extends Tftp implements Runnable {
 				setOpcode(sndBuffer, DAT);
 				blknum++;
 				setBlknum(sndBuffer, blknum);
-				int i;
 
+				int i;
 				for (i = 0; i < RetryNum; i++) {
-					sendPacket(subSocket, subPacket, sndBuffer, len + 4);
+					if (len > 0) {
+						sendPacket(subSocket, subPacket, sndBuffer, len + 4);
+					} else {
+						sendPacket(subSocket, subPacket, sndBuffer, 4);
+					}
+
 					try {
 						receivePacket(subSocket, subPacket, rcvBuffer);
 					} catch (Exception e) {
@@ -107,33 +114,35 @@ class Transfer extends Tftp implements Runnable {
 					}
 
 					switch (getOpcode(rcvBuffer)) {
-					case ACK:
-						if (getBlknum(rcvBuffer) == blknum)
-							i = RetryNum + 1;
-						break;
-					case ERR:
-						return;
+						case ACK :
+							if (getBlknum(rcvBuffer) == blknum)
+								i = RetryNum + 1;
+							break;
+						case ERR :
+							return;
 					}
 				}
 
-				sendsize += len;
+				if (len >= 0) {
+					sendsize += len;
+				}
 				if (i == RetryNum) {
 					sendMsg = filename + " -> "
-							+ remoteAddress.getHostAddress()
-							+ " Failed!";
+							+ remoteAddress.getHostAddress() + " Failed!";
 				} else {
 					percent = (int) (sendsize * 100 / filesize);
-					sendMsg = Long.toString(percent)+ "% "
-							+ "( " + Long.toString(sendsize)
-							+ " / " + Long.toString(filesize) +" )"
-							+ filename + " -> "
-							+ remoteAddress.getHostAddress();
+					sendMsg = Long.toString(percent) + "% " + "( "
+							+ Long.toString(sendsize) + " / "
+							+ Long.toString(filesize) + " )" + filename
+							+ " -> " + remoteAddress.getHostAddress();
 				}
 
 				progressMsg();
 
-				if (len < PKG_LEN - 4)
+				if (len < PKG_LEN - 4) {
+					System.out.println(len);
 					break;
+				}
 
 			}
 

@@ -9,7 +9,6 @@ public class Server extends Tftp implements Runnable {
 
 	}
 
-	@Override
 	public void run() {
 		try {
 			byte[] rcvBuffer = new byte[PKG_LEN];
@@ -28,26 +27,26 @@ public class Server extends Tftp implements Runnable {
 				System.out.println("opcode:   " + opcode);
 
 				switch (opcode) {
-				case RRQ:
-				case WRQ:
-					filename = getFilename(rcvBuffer);
-					mod = getMod(rcvBuffer);
-					System.out.println("filename: " + filename);
-					System.out.println("mod:      " + mod);
+					case RRQ :
+					case WRQ :
+						filename = getFilename(rcvBuffer);
+						mod = getMod(rcvBuffer);
+						System.out.println("filename: " + filename);
+						System.out.println("mod:      " + mod);
 
-					TransferInfo subTransferThread = new TransferInfo(
-							packet.getAddress(), packet.getPort(), opcode,
-							filename, mod);
-					System.out.println(packet.getSocketAddress());
+						TransferInfo subTransferThread = new TransferInfo(
+								packet.getAddress(), packet.getPort(), opcode,
+								filename, mod);
+						System.out.println(packet.getSocketAddress());
 
-					processTransferInfo(subTransferThread);
+						processTransferInfo(subTransferThread);
 
-					new Thread(subTransferThread).start();
-					break;
+						new Thread(subTransferThread).start();
+						break;
 
-				default:
+					default :
 
-					break;
+						break;
 				}
 			}
 
@@ -60,7 +59,6 @@ public class Server extends Tftp implements Runnable {
 		}
 
 	}
-
 
 	public static void main(String[] args) {
 		Server server = new Server();
