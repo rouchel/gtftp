@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -6,10 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.Arrays;
-
-import com.sun.jndi.url.iiopname.iiopnameURLContextFactory;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 class Transfer extends Tftp implements Runnable {
 
@@ -18,18 +13,13 @@ class Transfer extends Tftp implements Runnable {
 
 	private byte[] rcvBuffer;
 	private byte[] sndBuffer;
-	private InetAddress remoteAddress;
-	private int remotePort;
+	private InetAddress destAddr;
+	private int destPort;
 	private short opcode;
-<<<<<<< HEAD
-	protected String path = "/maxwit/ebook/";
-=======
-	private String path = "/media/0002751C0006EF15/";
->>>>>>> 3dc09651cdf28f52bfdf3239081069c1aad56dc5
-	private String filename;
+	private String serverPath;
+	private String fileName;
 	private long filesize;
 	private long sendsize;
-	private String mod;
 	protected String sendMsg;
 	protected int percent;
 
@@ -39,13 +29,13 @@ class Transfer extends Tftp implements Runnable {
 		// System.out.print(sendMsg + '\r');
 	}
 
-	public Transfer(InetAddress remoteAddress, int remotePort, short opcode,
-			String filename, String mod) {
-		this.remoteAddress = remoteAddress;
-		this.remotePort = remotePort;
-		this.opcode = opcode;
-		this.filename = filename;
-		this.mod = mod;
+	public Transfer(InetAddress addr, int port, short request,
+			String path, String file, String mode) {
+		destAddr = addr;
+		destPort = port;
+		opcode = request;
+		serverPath = path + "/";
+		fileName = file;
 		rcvBuffer = new byte[PKG_LEN];
 		sndBuffer = new byte[PKG_LEN];
 	}
@@ -71,15 +61,15 @@ class Transfer extends Tftp implements Runnable {
 
 	private void rrq() throws IOException {
 		subSocket = new DatagramSocket();
-		subPacket = new DatagramPacket(rcvBuffer, PKG_LEN, remoteAddress,
-				remotePort);
+		subPacket = new DatagramPacket(rcvBuffer, PKG_LEN, destAddr,
+				destPort);
 		RandomAccessFile af = null;
 
 		try {
 			try {
-				af = new RandomAccessFile(path + filename, "r");
+				af = new RandomAccessFile(serverPath + fileName, "r");
 			} catch (FileNotFoundException e1) {
-				setError(sndBuffer, (short) 1, filename + " is not exist!");
+				setError(sndBuffer, (short) 1, fileName + " is not exist!");
 				sendPacket(subSocket, subPacket, sndBuffer, PKG_LEN);
 				e1.printStackTrace();
 				return;
@@ -131,14 +121,14 @@ class Transfer extends Tftp implements Runnable {
 					sendsize += len;
 				}
 				if (i == RetryNum) {
-					sendMsg = filename + " -> "
-							+ remoteAddress.getHostAddress() + " Failed!";
+					sendMsg = fileName + " -> "
+							+ destAddr.getHostAddress() + " Failed!";
 				} else {
 					percent = (int) (sendsize * 100 / filesize);
 					sendMsg = Long.toString(percent) + "% " + "( "
 							+ Long.toString(sendsize) + " / "
-							+ Long.toString(filesize) + " )" + filename
-							+ " -> " + remoteAddress.getHostAddress();
+							+ Long.toString(filesize) + " )" + fileName
+							+ " -> " + destAddr.getHostAddress();
 				}
 
 				progressMsg();
@@ -150,7 +140,7 @@ class Transfer extends Tftp implements Runnable {
 
 			}
 
-			System.out.println(filename + " send to " + remoteAddress
+			System.out.println(fileName + " send to " + destAddr
 					+ " is done!~");
 		} finally {
 			af.close();
@@ -160,9 +150,9 @@ class Transfer extends Tftp implements Runnable {
 
 	private void wrq() throws IOException {
 		subSocket = new DatagramSocket();
-		subPacket = new DatagramPacket(sndBuffer, PKG_LEN, remoteAddress,
-				remotePort);
-		RandomAccessFile af = new RandomAccessFile(filename, "rw");
+		subPacket = new DatagramPacket(sndBuffer, PKG_LEN, destAddr,
+				destPort);
+		RandomAccessFile af = new RandomAccessFile(fileName, "rw");
 
 		try {
 			short blknum = 0;
@@ -189,7 +179,7 @@ class Transfer extends Tftp implements Runnable {
 			af.close();
 		}
 
-		System.out.println(filename + " receive from " + remoteAddress
+		System.out.println(fileName + " receive from " + destAddr
 				+ " is done!~");
 	}
 

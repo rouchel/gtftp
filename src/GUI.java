@@ -20,14 +20,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.xml.soap.Text;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
-import sun.misc.Signal;
-import sun.security.krb5.internal.Ticket;
 
 public class GUI extends JFrame {
 
@@ -40,12 +32,7 @@ public class GUI extends JFrame {
 	private JButton btExit;
 	private JButton btPath;
     protected JTextField pathTf;
-	private JButton ipAddr;
 	private JPanel panel;
-<<<<<<< HEAD
-	//protected String signal;
-=======
->>>>>>> 3dc09651cdf28f52bfdf3239081069c1aad56dc5
 
 	public void addProcessBar(JProgressBar bar) {
 		panel.add(bar);
@@ -117,13 +104,6 @@ public class GUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-<<<<<<< HEAD
-				Server t1 = null;
-				
-				new Thread(t1).start();
-=======
-				
->>>>>>> 3dc09651cdf28f52bfdf3239081069c1aad56dc5
 			}
 
 		});
