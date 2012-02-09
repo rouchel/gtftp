@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.text.DecimalFormat;
 
 class Transfer extends Tftp implements Runnable {
 
@@ -26,6 +27,7 @@ class Transfer extends Tftp implements Runnable {
 	private long recvsize;
 	protected String sendMsg;
 	protected int percent;
+	protected DecimalFormat df;
 
 	static final int RetryNum = 5;
 
@@ -40,9 +42,9 @@ class Transfer extends Tftp implements Runnable {
 		opcode = request;
 		serverPath = path + "/";
 		fileName = file;
-		mod = mode;
 		rcvBuffer = new byte[PKG_LEN];
 		sndBuffer = new byte[PKG_LEN];
+		df = new DecimalFormat("#0.00");
 	}
 
 	@Override
@@ -128,8 +130,10 @@ class Transfer extends Tftp implements Runnable {
 
 			percent = (int) (sendsize * 100 / filesize);
 			sendMsg = Long.toString(percent) + "% " + "( "
-					+ Long.toString(sendsize) + " / " + Long.toString(filesize)
-					+ " )" + fileName + " -> " + destAddr.getHostAddress();
+					+ getSizeString(sendsize) + getSizeUnit(sendsize) + " / "
+					+ getSizeString(filesize) + getSizeUnit(filesize) + " )"
+					+ fileName + " -> " + destAddr.getHostAddress();
+
 			progressMsg(true);
 
 			if (len < PKG_LEN - 4) {
@@ -202,8 +206,9 @@ class Transfer extends Tftp implements Runnable {
 
 					recvsize += len - 4;
 
-					sendMsg = fileName + "( " + Long.toString(recvsize) + " )"
-							+ " <- " + destAddr.getHostAddress();
+					sendMsg = fileName + "( " + getSizeString(recvsize)
+							+ getSizeUnit(recvsize) + " )" + " <- "
+							+ destAddr.getHostAddress();
 					progressMsg(true);
 				}
 
@@ -214,7 +219,8 @@ class Transfer extends Tftp implements Runnable {
 
 			setAck(sndBuffer, blknum);
 			sendPacket(subSocket, subPacket, sndBuffer, PKG_LEN);
-			sendMsg = fileName + "( " + Long.toString(recvsize) + " )" + " <- "
+			sendMsg = fileName + "( " + getSizeString(recvsize)
+					+ getSizeUnit(recvsize) + " )" + " <- "
 					+ destAddr.getHostAddress() + " is done!";
 			progressMsg(true);
 
@@ -225,5 +231,29 @@ class Transfer extends Tftp implements Runnable {
 
 		System.out.println(fileName + " receive from " + destAddr
 				+ " is done!~");
+	}
+
+	private String getSizeString(double size) {
+		if (size < 1000) {
+			return Double.toString(size);
+		} else if ((size > 1000) && (size < 1000000)) {
+			return df.format(size / 1000);
+		} else if ((size > 1000000) & (size < 1000000000)) {
+			return df.format(size / 1000000);
+		} else {
+			return df.format(size / 1000000000);
+		}
+	}
+
+	private String getSizeUnit(double size) {
+		if (size < 1000) {
+			return "B";
+		} else if ((size > 1000) && (size < 1000000)) {
+			return "K";
+		} else if ((size > 1000000) & (size < 1000000000)) {
+			return "M";
+		} else {
+			return "G";
+		}
 	}
 }

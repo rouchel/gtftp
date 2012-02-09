@@ -27,4 +27,5 @@ public class TransferGui extends Transfer {
 			progressBar.setBackground(Color.black);
 		}
 	}
+
 }
