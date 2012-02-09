@@ -6,14 +6,13 @@ import java.net.SocketException;
 
 
 public class Server extends Tftp {
-	protected String serverPath = "./";
+	protected String serverPath = SERVER_PATH;
 	protected boolean isRunning = true;
 
-	void createTransfer(InetAddress addr, int port, short request,
-			String path, String file, String mode) {
+	void createTransfer(InetAddress addr, int port, short request, String path,
+			String file, String mode) {
 
-		Transfer transfer = 
-				new Transfer(addr, port, request, path, file, mode);
+		Transfer transfer = new Transfer(addr, port, request, path, file, mode);
 
 		new Thread(transfer).start();
 	}
@@ -45,13 +44,13 @@ public class Server extends Tftp {
 					case WRQ :
 						filename = getFilename(rcvBuffer);
 						mod = getMod(rcvBuffer);
-						System.out.println("filename: " + filename);
-						System.out.println("mod:      " + mod);
+						// System.out.println("filename: " + filename);
+						// System.out.println("mod:      " + mod);
 
 						System.out.println(packet.getSocketAddress());
-						createTransfer(packet.getAddress(), packet.getPort(), opcode,
-								serverPath, filename, mod);
-						
+						createTransfer(packet.getAddress(), packet.getPort(),
+								opcode, serverPath, filename, mod);
+
 						break;
 
 					default :
