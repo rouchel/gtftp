@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
-public class ServerGUI extends Server {
+public class ServerGUI extends Server implements Runnable {
 	private JFrame frame;
 	private JLabel label;
 	private JScrollPane sp;
@@ -33,12 +33,13 @@ public class ServerGUI extends Server {
 //	Map<Long, Thread> threadList;
 	HashMap<Long, Thread> threadList;
 	
+	@SuppressWarnings("deprecation")
 	void stopServer() {
 		isRunning = false;
 		
 		for (Thread thread : threadList.values()) {
 			if (thread.isAlive()) {
-				thread.interrupt();
+				thread.stop();
 			}
 		}
 

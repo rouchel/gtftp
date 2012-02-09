@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.text.DecimalFormat;
 
 class Transfer extends Tftp implements Runnable {
 
@@ -18,10 +19,11 @@ class Transfer extends Tftp implements Runnable {
 	private short opcode;
 	private String serverPath;
 	private String fileName;
-	private long filesize;
-	private long sendsize;
+	private double filesize;
+	private double sendsize;
 	protected String sendMsg;
 	protected int percent;
+	protected DecimalFormat df;
 
 	static final int RetryNum = 5;
 
@@ -38,6 +40,7 @@ class Transfer extends Tftp implements Runnable {
 		fileName = file;
 		rcvBuffer = new byte[PKG_LEN];
 		sndBuffer = new byte[PKG_LEN];
+		df = new DecimalFormat("#0.00");
 	}
 
 	@Override
@@ -123,11 +126,11 @@ class Transfer extends Tftp implements Runnable {
 				if (i == RetryNum) {
 					sendMsg = fileName + " -> "
 							+ destAddr.getHostAddress() + " Failed!";
-				} else {
+				} else {					
 					percent = (int) (sendsize * 100 / filesize);
 					sendMsg = Long.toString(percent) + "% " + "( "
-							+ Long.toString(sendsize) + " / "
-							+ Long.toString(filesize) + " )" + fileName
+							+ getSizeString(sendsize) + getSizeUnit(sendsize) + " / "
+							+ getSizeString(filesize) + getSizeUnit(filesize) +  " )" + fileName
 							+ " -> " + destAddr.getHostAddress();
 				}
 
@@ -147,7 +150,31 @@ class Transfer extends Tftp implements Runnable {
 			subSocket.close();
 		}
 	}
-
+	
+	private String getSizeString (double size) {
+		if (size < 1000) {
+			return Double.toString(size);
+		} else if ((size > 1000) && (size < 1000000)) {
+			return  df.format(size / 1000);
+		} else if ((size > 1000000) & (size < 1000000000)){
+			return df.format(size / 1000000);
+		} else {
+			return df.format(size / 1000000000);
+		}
+	}
+	
+	private String getSizeUnit(double size) {
+		if (size < 1000) {
+			return "B";
+		} else if ((size > 1000) && (size < 1000000)) {
+			return "K";
+		} else if ((size > 1000000) & (size < 1000000000)){
+			return "M";
+		} else {
+			return "G";
+		}
+	}
+	
 	private void wrq() throws IOException {
 		subSocket = new DatagramSocket();
 		subPacket = new DatagramPacket(sndBuffer, PKG_LEN, destAddr,
