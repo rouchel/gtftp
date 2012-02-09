@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.net.InetAddress;
 
 import javax.swing.JProgressBar;
@@ -5,8 +6,8 @@ import javax.swing.JProgressBar;
 public class TransferGui extends Transfer {
 	JProgressBar progressBar;
 
-	public TransferGui(InetAddress remoteAddress, int remotePort,
-			short opcode, String path, String filename, String mod) {
+	public TransferGui(InetAddress remoteAddress, int remotePort, short opcode,
+			String path, String filename, String mod) {
 		super(remoteAddress, remotePort, opcode, path, filename, mod);
 		// TODO Auto-generated constructor stub
 
@@ -15,10 +16,15 @@ public class TransferGui extends Transfer {
 	}
 
 	@Override
-	protected void progressMsg() {
+	protected void progressMsg(boolean isRight) {
 		// TODO Auto-generated method stub
 		// super.progressMsg();
 		progressBar.setValue(percent);
 		progressBar.setString(sendMsg);
+
+		if (!isRight) {
+			progressBar.setValue(0);
+			progressBar.setBackground(Color.black);
+		}
 	}
 }

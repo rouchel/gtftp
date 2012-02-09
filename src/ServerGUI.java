@@ -31,21 +31,21 @@ public class ServerGUI extends Server {
 	private JButton btPath;
 	private JTextField pathTf;
 	private JPanel panel;
-//	Map<Long, Thread> threadList;
+	// Map<Long, Thread> threadList;
 	HashMap<Long, Thread> threadList;
-	
+
 	void stopServer() {
 		isRunning = false;
-		
+
 		for (Thread thread : threadList.values()) {
 			if (thread.isAlive()) {
-				thread.interrupt();
+				thread.stop();
 			}
 		}
 
 		btStat.setText("Start");
 	}
-	
+
 	void startServer() {
 		isRunning = true;
 		btStat.setText("Stop");
@@ -58,7 +58,7 @@ public class ServerGUI extends Server {
 
 	public ServerGUI() {
 		threadList = new HashMap<Long, Thread>();
-				
+
 		frame = new JFrame("TFTP Server");
 		frame.setLayout(null);
 		frame.setBackground(Color.white);
@@ -80,27 +80,28 @@ public class ServerGUI extends Server {
 		panel.setLayout(new GridLayout(20, 1));
 
 		pathTf = new JTextField();
+		pathTf.setText(SERVER_PATH);
 		frame.add(pathTf);
 		pathTf.setBounds(120, 500, 220, 30);
 
 		pathTf.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				if (e.getKeyChar() == '\n')					
+				if (e.getKeyChar() == '\n')
 					serverPath = pathTf.getText();
 			}
 		});
@@ -118,7 +119,7 @@ public class ServerGUI extends Server {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
@@ -186,9 +187,9 @@ public class ServerGUI extends Server {
 		// TODO Auto-generated method stub
 		Thread transferThread;
 
-		TransferGui transfer = 
-				new TransferGui(addr, port, request, path, file, mode);
-		
+		TransferGui transfer = new TransferGui(addr, port, request, path, file,
+				mode);
+
 		addProcessBar(transfer.progressBar);
 		transferThread = new Thread(transfer);
 		System.out.println(transferThread.getId());

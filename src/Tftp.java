@@ -13,6 +13,8 @@ public class Tftp {
 	static final int TFTP_PORT = 69;
 	static final int PKG_LEN = 516;
 
+	protected static String SERVER_PATH = "/maxwit/source";
+
 	public short getOpcode(byte[] rcvBuffer) {
 		return (short) ((((short) rcvBuffer[0]) << 8) + (short) rcvBuffer[1] & 0x00ff);
 	}
@@ -62,8 +64,7 @@ public class Tftp {
 		int i;
 		String mod;
 
-		for (i = 2; rcvBuffer[i] != 0; i++)
-			;
+		for (i = 2; rcvBuffer[i] != 0; i++);
 
 		for (mod = "", i++; rcvBuffer[i] != 0; i++) {
 			mod = mod + (char) rcvBuffer[i];
