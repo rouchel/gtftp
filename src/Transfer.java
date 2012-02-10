@@ -28,6 +28,7 @@ class Transfer extends Tftp implements Runnable {
 	protected String sendMsg;
 	protected int percent;
 	protected DecimalFormat df;
+	private boolean finish;
 
 	static final int RetryNum = 5;
 
@@ -45,6 +46,7 @@ class Transfer extends Tftp implements Runnable {
 		rcvBuffer = new byte[PKG_LEN];
 		sndBuffer = new byte[PKG_LEN];
 		df = new DecimalFormat("#0.00");
+		finish = false;
 	}
 
 	@Override
@@ -86,13 +88,13 @@ class Transfer extends Tftp implements Runnable {
 		filesize = af.length();
 		short blknum = 0;
 		int len;
-		L1 : while (true) {
+		L1: while (!Thread.interrupted()) {
 			len = af.read(sndBuffer, 4, PKG_LEN - 4);
 			setOpcode(sndBuffer, DAT);
 			blknum++;
 			setBlknum(sndBuffer, blknum);
 
-			for (int i = 0; i < RetryNum; i++) {
+			for (int i = 0; i < RetryNum && !Thread.interrupted(); i++) {
 				if (len > 0) {
 					sendPacket(subSocket, subPacket, sndBuffer, len + 4);
 				} else {
@@ -115,12 +117,12 @@ class Transfer extends Tftp implements Runnable {
 				}
 
 				switch (getOpcode(rcvBuffer)) {
-					case ACK :
-						if (getBlknum(rcvBuffer) == blknum)
-							i = RetryNum + 1;
-						break;
-					case ERR :
-						break L1;
+				case ACK:
+					if (getBlknum(rcvBuffer) == blknum)
+						i = RetryNum + 1;
+					break;
+				case ERR:
+					break L1;
 				}
 			}
 
@@ -137,9 +139,18 @@ class Transfer extends Tftp implements Runnable {
 			progressMsg(true);
 
 			if (len < PKG_LEN - 4) {
+				finish = true;
 				System.out.println(len);
 				break;
 			}
+		}
+
+		if (finish) {
+			sendMsg += " Finish!";
+			progressMsg(true);
+		} else {
+			sendMsg += " Stop!";
+			progressMsg(false);
 		}
 
 		// System.out.println(fileName + " send to " + destAddr + " is done!~");
@@ -182,12 +193,12 @@ class Transfer extends Tftp implements Runnable {
 					}
 
 					switch (getOpcode(rcvBuffer)) {
-						case DAT :
-							if (getBlknum(rcvBuffer) == blknum)
-								i = RetryNum + 1;
-							break;
-						case ERR :
-							return;
+					case DAT:
+						if (getBlknum(rcvBuffer) == blknum)
+							i = RetryNum + 1;
+						break;
+					case ERR:
+						return;
 					}
 
 					dataBuffer = Arrays.copyOfRange(rcvBuffer, 4, PKG_LEN);

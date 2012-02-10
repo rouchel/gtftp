@@ -64,7 +64,8 @@ public class Tftp {
 		int i;
 		String mod;
 
-		for (i = 2; rcvBuffer[i] != 0; i++);
+		for (i = 2; rcvBuffer[i] != 0; i++)
+			;
 
 		for (mod = "", i++; rcvBuffer[i] != 0; i++) {
 			mod = mod + (char) rcvBuffer[i];

@@ -21,6 +21,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
+import sun.awt.image.OffScreenImage;
+
 public class ServerGUI extends Server implements Runnable {
 	private JFrame frame;
 	private JLabel label;
@@ -30,23 +32,32 @@ public class ServerGUI extends Server implements Runnable {
 	private JButton btPath;
 	private JTextField pathTf;
 	private JPanel panel;
-	// Map<Long, Thread> threadList;
+	Thread serverThread;
+	boolean isRunning;
 	HashMap<Long, Thread> threadList;
+
 	void stopServer() {
-		isRunning = false;
+		if (serverThread != null) {
+			serverThread.interrupt();
+		}
 
 		for (Thread thread : threadList.values()) {
 			if (thread.isAlive()) {
-				thread.stop();
+				thread.interrupt();
 			}
 		}
 
 		btStat.setText("Start");
+		isRunning = false;
 	}
 
 	void startServer() {
-		isRunning = true;
+		while (serverThread != null && serverThread.isAlive())
+			;
+		serverThread = new Thread(this);
+		serverThread.start();
 		btStat.setText("Stop");
+		isRunning = true;
 	}
 
 	private void addProcessBar(JProgressBar bar) {
@@ -198,6 +209,5 @@ public class ServerGUI extends Server implements Runnable {
 
 	public static void main(String[] args) {
 		ServerGUI server = new ServerGUI();
-		new Thread(server).start();
 	}
 }

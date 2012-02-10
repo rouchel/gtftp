@@ -22,9 +22,12 @@ public class TransferGui extends Transfer {
 		progressBar.setValue(percent);
 		progressBar.setString(sendMsg);
 
-		if (!isRight) {
+		if (percent == 100) {
 			progressBar.setValue(0);
-			progressBar.setBackground(Color.black);
+			progressBar.setBackground(Color.cyan);
+		} else if (!isRight) {
+			progressBar.setValue(0);
+			progressBar.setBackground(Color.red);
 		}
 	}
 
